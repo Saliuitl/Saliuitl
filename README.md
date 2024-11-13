@@ -1,14 +1,18 @@
-###
-DESCRIPTION
-###
+## DESCRIPTION
+
 This repository contains the PyTorch implementation of Saliuitl, organized as follows:
 
 directories:
-cfg: contains cfg files for possible object detection victim models (YOLOv2 by default)
+cfg: contains cfg files for possible object detection victim models (YOLOv2 by default).
+
 checkpoints: contains the weights for the AD attack detector net. The weights for ResNet50 on CIFAR-10 should be placed in this folder.
+
 data: contains the folder structure required to run Saliuitl on the datasets introduced in the paper. Due to the file size, only a small amount of examples are included for each dataset.
-nets: torch models for AD and ResNet50
+
+nets: torch models for AD and ResNet50.
+
 utils: contains utils.py, a file with helper functions of object detection.
+
 weights: the weights for YOLOv2 should be placed in this folder.
 
 cfg.py, darknet.py, region_loss.py: files required to run YOLOv2 using PyTorch.
@@ -16,22 +20,31 @@ helper.py: various helper functions to perform object detection.
 saliuitl.py: main code to run and evaluate attack detection and/or recovery using Saliuitl
 
 Our code is based on the following publicly available repositories:
+
 https://github.com/Zhang-Jack/adversarial_yolo2
+
 https://github.com/inspire-group/PatchGuard/tree/master
 
-To run attacks on CIFAR-10 it is necessary to download the resnet50_192_cifar.pth file from https://github.com/inspire-group/PatchGuard/tree/master and place it in the checkpoints folder
-To run attacks on INRIA and Pascal VOC it is necessary to follow the instructions on https://github.com/Zhang-Jack/adversarial_yolo2 to download the yolo.weights file into the weights folder
-###
-EXAMPLE COMMANDS
-###
+To run attacks on CIFAR-10 it is necessary to download the resnet50_192_cifar.pth file from https://github.com/inspire-group/PatchGuard/tree/master and place it in the checkpoints folder.
+
+To run attacks on INRIA and Pascal VOC it is necessary to follow the instructions on https://github.com/Zhang-Jack/adversarial_yolo2 to download the yolo.weights file into the weights folder.
+
+## EXAMPLE COMMANDS
 Run Saliuitl on effective rectangular single-patch attacks on INRIA using default settings (the "unsuccesful attacks" in the output refer to the recovery rate):
+```
 python saliuitl.py --inpaint_pro --imgdir data/inria/clean --patch_imgdir data/inria/proper_patched/1p --dataset inria --det_net_path checkpoints/final_detection/2dcnn_raw_inria_5_atk_det.pth --det_net 2dcnn_raw --ensemble_step 5 --inpainting_step 5 --effective_files effective_1p.npy --n_patches 1
+```
+
 
 For double patches:
+```
 python saliuitl.py --inpaint_pro --imgdir data/inria/clean --patch_imgdir data/inria/proper_patched/2p --dataset inria --det_net_path checkpoints/final_detection/2dcnn_raw_inria_5_atk_det.pth --det_net 2dcnn_raw --ensemble_step 5 --inpainting_step 5 --effective_files effective_2p.npy --n_patches 2
+```
 
 For triangular patches:
+```
 python saliuitl.py --inpaint_pro --imgdir data/inria/clean --patch_imgdir data/inria/proper_patched/trig --dataset inria --det_net_path checkpoints/final_detection/2dcnn_raw_inria_5_atk_det.pth --det_net 2dcnn_raw --ensemble_step 5 --inpainting_step 5 --effective_files effective_1p.npy --n_patches 1
+```
 
 To evaluate lost predictions, use the clean counterpart of each attack by adding the "--clean" flag to the above commands (the "succesful attacks" in the output refer to the lost prediction rate), for example:
 python saliuitl.py --inpaint_pro --imgdir data/inria/clean --patch_imgdir data/inria/proper_patched/1p --dataset inria --det_net_path checkpoints/final_detection/2dcnn_raw_inria_5_atk_det.pth --det_net 2dcnn_raw --ensemble_step 5 --inpainting_step 5 --effective_files effective_1p.npy --n_patches 1 --clean
