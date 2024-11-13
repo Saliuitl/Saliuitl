@@ -20,7 +20,6 @@ from PIL import Image, ImageDraw
 import nets.resnet
 import nets.attack_detector
 from darknet import *
-
 from helper import *
 
 import json
@@ -38,10 +37,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--save",action='store_true',help="save results to txt")
 parser.add_argument("--savedir",default='NN_based_imgclass/',type=str,help="save path")
 #inpainting mode:
-parser.add_argument("--cheat",action='store_true',help="oracle inpainting")
-parser.add_argument("--inpaint_zero",action='store_true',help="inpaint with zero values")
-parser.add_argument("--inpaint_mean",action='store_true',help="inpaint with unsuspicious mean value")
-parser.add_argument("--inpaint_pro",action='store_true',help="use inpainting algo (default)")
+parser.add_argument("--inpaint",default="biharmonic",type=str, choices=('zero','mean', 'biharmonic', 'diffusion', 'oracle'), help="inpainting method")
 #victim model (obj. det.)
 parser.add_argument("--cfg",default="cfg/yolo.cfg",type=str,help="relative directory to cfg file")
 parser.add_argument("--weightfile",default="weights/yolo.weights",type=str,help="path to checkpoints")
@@ -246,7 +242,7 @@ def beta_iteration(beta, fm, raw=True):
         return biggie, feat_stack
     return biggie
 
-val_dataset=os.listdir(imgdir)[:min(args.lim, len(os.listdir(imgdir)))]
+val_dataset=sorted(os.listdir(imgdir)[:min(args.lim, len(os.listdir(imgdir)))])
 
 if args.dataset in ['inria', 'voc']:
     for imgfile in tqdm(val_dataset):
@@ -261,9 +257,12 @@ if args.dataset in ['inria', 'voc']:
             transform = transforms.ToTensor()
             padded_img = transform(padded_img).cuda()
             img_fake_batch = padded_img.unsqueeze(0)
-            cheat=img_fake_batch.detach().clone()
+            #in case oracle inpainting is tested
+            if args.inpaint=='oracle':
+                cheat=img_fake_batch.detach().clone()
             clean_boxes, feature_map = do_detect(model, img_fake_batch, 0.4, 0.4, True, direct_cuda_img=True)
             clean_boxes=clean_boxes
+            #if nothing is detected in the clean version of the image...
             if not(len(clean_boxes)):
                 continue
             kount=kount+1
@@ -365,6 +364,7 @@ if args.dataset in ['inria', 'voc']:
                     dirso=[]
                     masking=0
                     for d in this:
+                        #clusters should have 4+ elements
                         if len(d)<4:
                             continue
                         dirso.append(d)
@@ -388,18 +388,18 @@ if args.dataset in ['inria', 'voc']:
                     p=np.where(imgneer>0.0)
                     in_img=p_img.detach().clone()
                     #Saliuitl*
-                    if args.cheat:
+                    if args.inpaint=='oracle':
                         in_img[:, :, [p[0]], [p[1]]] = cheat[:, :, [p[0]], [p[1]]]#0.0
                     #Saliuitl-Z
-                    elif args.inpaint_zero:
+                    elif args.inpaint=='zero':
                         in_img[:, :, [p[0]], [p[1]]] = 0.0
                     #Saliuitl
-                    elif args.inpaint_pro:
+                    elif args.inpaint=='biharmonic':
                         in_img=in_img.squeeze(0).cpu().numpy()
                         in_img = inpaint.inpaint_biharmonic(in_img, imgneer, channel_axis=0)
                         in_img=torch.from_numpy(in_img).cuda().unsqueeze(0)
                     #Earlier fast version: inpaint by replacing suspicious regions with mean value of non-important pixels!
-                    elif args.inpaint_mean:
+                    elif args.inpaint=='mean':
                         p_neg=np.where(imgneer<=0.0)
                         in_img[:, :, [p[0]], [p[1]]] = torch.mean(in_img[:, :, [p_neg[0]], [p_neg[1]]])
                     else:
@@ -620,18 +620,18 @@ elif args.dataset in ['cifar', 'imagenet']:
                     bfm_old=bfm
 
                     #saliuitl*
-                    if args.cheat:
+                    if args.inpaint=='oracle':
                         in_img[:, :, [p[0]], [p[1]]] = cheat[:, :, [p[0]], [p[1]]]
                     #saliuitl-z
-                    elif args.inpaint_zero:
+                    elif args.inpaint=='zero':
                         in_img[:, :, [p[0]], [p[1]]] = 0.0
                     #Saliuitl
-                    elif args.inpaint_pro:
+                    elif args.inpaint=='biharmonic':
                         in_img=denorm(in_img.squeeze(0)).cpu().numpy()#.astype('uint8')
                         in_img = inpaint.inpaint_biharmonic(in_img, imgneer, channel_axis=0)
                         in_img=ds_transforms_inp(torch.from_numpy(in_img)).cuda().unsqueeze(0)
                     #Earlier fast version: inpaint by replacing suspicious regions with mean value of non-important pixels!
-                    elif args.inpaint_mean:
+                    elif args.inpaint=='mean':
                         p_neg=np.where(imgneer<=0.0)
                         in_img[:, :, [p[0]], [p[1]]] = torch.mean(in_img[:, :, [p_neg[0]], [p_neg[1]]])
                     else:
