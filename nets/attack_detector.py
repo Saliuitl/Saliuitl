@@ -1,8 +1,3 @@
-###########################################################################################
-# Adapted from https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py #
-# Mainly changed the model forward() function                                             #
-###########################################################################################
-
 import torch
 import torch.nn as nn
 import numpy as np
