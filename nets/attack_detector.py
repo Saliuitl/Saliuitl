@@ -3,13 +3,8 @@ import torch.nn as nn
 import numpy as np
 from torchvision import datasets, transforms
 
-#from torchvision.models import resnet50, ResNet50_Weights
-
 import numpy
 import torch
-
-#X = numpy.random.uniform(-10, 10, 70).reshape(1, 7, -1)
-# Y = np.random.randint(0, 9, 10).reshape(1, 1, -1)
 
 def attack_detector(pretrained=False, path=None):
     model = AtkDetNet()
@@ -27,7 +22,7 @@ def cnn_raw(pretrained=False, path=None, leg=False, in_feats=4):
     if not leg:
         model = AtkDetCNNRaw(in_feats=in_feats)
     else:
-        model = AtkDetCNNRawLegatto
+        return None
     if pretrained and path is not None:
         model.load_state_dict(path)
     return model
