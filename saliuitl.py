@@ -40,45 +40,39 @@ parser.add_argument("--savedir",default='NN_based_imgclass/',type=str,help="save
 parser.add_argument("--inpaint",default="biharmonic",type=str, choices=('zero','mean', 'biharmonic', 'diffusion', 'oracle'), help="inpainting method")
 #victim model (obj. det.)
 parser.add_argument("--cfg",default="cfg/yolo.cfg",type=str,help="relative directory to cfg file")
-parser.add_argument("--weightfile",default="weights/yolo.weights",type=str,help="path to checkpoints")
+parser.add_argument("--weightfile",default="weights/yolo.weights",type=str,help="path to YOLOv2 checkpoints")
 
 parser.add_argument("--performance",action='store_true',help="save recovery performance (time) per frame")
 parser.add_argument("--performance_det",action='store_true',help="save detection performance (time) per frame")
 
 parser.add_argument("--effective_files",default=None,type=str,help="file with list of effective adv examples")
 parser.add_argument("--geteff",action='store_true',help="save array with effective attack names")
-parser.add_argument("--uneffective",action='store_true',help="use only uneffective attacks")
+parser.add_argument("--uneffective",action='store_true',help="use only non-effective attacks")
 
 
-parser.add_argument("--clean",action='store_true',help="use clean images")
+parser.add_argument("--clean",action='store_true',help="use only clean images")
 parser.add_argument("--bypass_det",action='store_true',help="skip detection stage")
 parser.add_argument("--bypass",action='store_true',help="skip recovery stage")
 
 parser.add_argument("--lim",default=1000000,type=int,help="limit on number of images/frames to process")
-parser.add_argument('--imgdir', default="inria/Train/pos", type=str,help="path to data")
-parser.add_argument('--patch_imgdir', default="inria/Train/pos", type=str,help="path to adversarially patched data")
-parser.add_argument('--ground_truth', default=None, type=str,help="path to patched data")
+parser.add_argument('--imgdir', default="inria/Train/pos", type=str,help="path to clean data")
+parser.add_argument('--patch_imgdir', default="inria/Train/pos", type=str,help="path to adversarially patched version of data")
+parser.add_argument('--ground_truth', default=None, type=str,help="path to ground truth labels (applies only to image classification datasets)")
 parser.add_argument("--neulim",default=0.5,type=float,help="what fraction of input pixels are the max. that should be occluded?")
 
 parser.add_argument('--dataset', default='inria', choices=('inria','voc','imagenet','cifar'),type=str,help="dataset")
-parser.add_argument("--skip",default=1,type=int,help="number of example to skip")
-parser.add_argument("--det_net",default='2dcnn',type=str,help="model for detection")
-parser.add_argument("--det_net_path",default='checkpoints/2dcnn_raw_imagenet_atk_det.pth',type=str,help="path to trained detector model")
-parser.add_argument("--nn_det_threshold",default=0.5,type=float,help="decision threshold for NN detector (beta star in paper)")
-parser.add_argument("--iou_thresh",default=0.5,type=float,help="iou threshold for effective attack definition")
+parser.add_argument("--det_net",default='2dcnn_raw',type=str,help="architecture of attack detector AD")
+parser.add_argument("--det_net_path",default='checkpoints/2dcnn_raw_imagenet_atk_det.pth',type=str,help="path to trained AD weights")
+parser.add_argument("--nn_det_threshold",default=0.5,type=float,help="decision threshold for NN detector (alpha* in paper)")
+parser.add_argument("--iou_thresh",default=0.5,type=float,help="iou threshold for effective attack definition/evaluation")
 
-parser.add_argument("--save_scores",action='store_true',help="save detection scores")
-parser.add_argument("--save_outcomes",action='store_true',help="save recovery outcomes")
+parser.add_argument("--save_scores",action='store_true',help="save detection scores AD(s) - useful to evaluate attack detection")
+parser.add_argument("--save_outcomes",action='store_true',help="save recovery outcomes (for obj. detection these are bounding boxes, for img. classification a binary label indicating whether the output matches the ground truth)")
 parser.add_argument("--n_patches",default='1',type=str,help="number of patches (just an informative string to save results)")
-parser.add_argument("--trig",action='store_true',help="triangular patches")
 
-parser.add_argument("--dbscan_eps", default=1.0, type=float, help="how close to cluster two neurons?")
+parser.add_argument("--dbscan_eps", default=1.0, type=float, help="how close to cluster two neurons?  - default is 1 (only adjacent neurons)")
 parser.add_argument("--dbscan_min_pts", default=4, type=int, help="how many neurons is a cluster?")
-parser.add_argument("--neu_thresh",default=100,type=float,help="imp neu thresh")#100 for Cifar, 50 for ImgNet, 500 for INRIA
-parser.add_argument("--cluster_thresh",default=1,type=int,help="how many clsuters are too many for a clean image?")#1
-parser.add_argument("--binarize",action='store_true',help="binarize feature maps before clustering")
-parser.add_argument("--bin_mag", default=1.0, type=float, help="magnitude to scale binarized neurons (deprecated)")
-parser.add_argument("--beta_sweep",action='store_true',help="do a sweep over beta (default: 0.2 to 0.95 in 0.05 steps)")
+
 parser.add_argument("--scale_var",action='store_true',help="standardize variance before clustering")
 parser.add_argument("--scale_mean",action='store_true',help="center mean before clustering")
 
@@ -86,7 +80,7 @@ parser.add_argument('--ensemble_step', default=5, type=int, help='100/threshold 
 parser.add_argument('--inpainting_step', default=5, type=int, help='100/threshold set size')
 parser.add_argument("--eval_class",action='store_true',help="match class for iou evaluation")
 
-parser.add_argument('--remove', default='_', type=str, help='clusfeat to remove (ablation study)')
+parser.add_argument('--remove', default='_', type=str, help='optionally omit clustering features indicated as feat1_feat2_feat3 (ablation study)')
 args = parser.parse_args()
 
 warnings.filterwarnings("ignore")
