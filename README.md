@@ -2,7 +2,7 @@
 
 This repository contains the PyTorch implementation of Saliuitl, in particular it follows the proposed DBSCAN-based implementation in the paper, it is possible to customize the code to change the different components of Saliuitl, we will add examples in the future. Note that for simplicity, the attacked subsets of Pascal VOC and INRIA in this repository use the patch attack used during training in the paper. We will add code to create the patch scenarios using the attack we use for evaluation (or any other) soon. 
 
-![saliu_image](https://github.com/user-attachments/assets/6fdc5418-8696-447e-9f92-2f34379198f0)
+![saliu_image](https://github.com/user-attachments/assets/91ddf108-7702-42d0-9db7-a0022cd40ae1)
 
 Saliuitl means "ideological shift" in Nahuatl. The name is inspired by the shift of attrbiutes across ensembles which we use to detect adversarial patches.
 
