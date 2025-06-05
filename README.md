@@ -1,5 +1,5 @@
 A short overview of Saliuitl is available here: 
-[[![Watch the video](https://img.youtube.com/vi/APOPm01BVrk/hqdefault.jpg)](https://www.youtube.com/watch?](https://www.youtube.com/watch?v=cuay8lF8CCw&ab_channel=MauricioByrd)
+[![Watch the video](https://img.youtube.com/vi/cuay8lF8CCw/hqdefault.jpg)](https://www.youtube.com/watch?v=cuay8lF8CCw)
 
 ## DESCRIPTION
 This repository contains the PyTorch implementation of Saliuitl, in particular it follows the proposed DBSCAN-based implementation in the paper, it is possible to customize the code to change the different components of Saliuitl, we will add examples in the future. Note that for simplicity, the attacked subsets of Pascal VOC and INRIA in this repository use the patch attack used during training in the paper. We will add code to create the patch scenarios using the attack we use for evaluation (or any other) soon. 
