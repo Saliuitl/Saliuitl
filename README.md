@@ -87,7 +87,7 @@ python saliuitl.py --inpaint biharmonic --imgdir data/imagenet/clean --patch_img
 Refer to saliuitl.py for further customization options.
 
 ## TRAINING
-While we include the weights for trained instances of AD on all datasets, we also provide the training set feature maps we use to train AD. Not these can be used to also train alternative models, and one may also extract alternative attributes for the ensemble attribute vector. We exclude the Pascal VOC feature maps due to file size, but one may extract such feature maps for any dataset based on the main code for saliuitl, since we adapt vicitm models to return the feature maps we use for detection and recovery.
+While we include the weights for trained instances of AD on all datasets, we also provide the training set feature maps we use to train AD. Note these can be used to also train alternative models, and one may also extract alternative attributes for the ensemble attribute vector. We exclude the Pascal VOC feature maps due to file size, but one may extract such feature maps for any dataset based on the main code for Saliuitl, since we adapt vicitm models to return the feature maps we use for detection and recovery.
 
 Example commands to train AD using the default ensemble size of 20 and the DBSCAN-based attributes used for our evaluation are added below:
 
